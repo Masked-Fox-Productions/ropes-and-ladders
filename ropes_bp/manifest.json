@@ -1,0 +1,30 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Ropes and Ladders",
+    "description": "Climbable ropes, rope ladders, and whips",
+    "uuid": "de75da52-1b91-4904-be79-455b9129159c",
+    "version": [0, 1, 0],
+    "min_engine_version": [1, 26, 0]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "eab9e9ee-d3b4-4a73-b3fc-f91bb126508b",
+      "version": [0, 1, 0]
+    },
+    {
+      "type": "script",
+      "uuid": "33a837c2-5982-4f93-9fc4-0e79310ec626",
+      "version": [0, 1, 0],
+      "entry": "scripts/main.js",
+      "language": "javascript"
+    }
+  ],
+  "dependencies": [
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.7.0"
+    }
+  ]
+}

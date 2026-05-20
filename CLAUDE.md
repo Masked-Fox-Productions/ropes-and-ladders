@@ -6,24 +6,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Minecraft mod targeting both Bedrock Edition (Script API + JSON definitions) and Java Edition (Fabric). The repo ships:
 
-- `mymod_bp/` — behavior pack: block JSONs, recipes, entities, and the script bundle entered at `scripts/main.js`.
-- `mymod_rp/` — resource pack: lang strings and textures.
-- `java-mymod/` — Fabric mod: Gradle-based Java project with the same game logic.
+- `ropes_bp/` — behavior pack: block JSONs, items, and the script bundle entered at `scripts/main.js`.
+- `ropes_rp/` — resource pack: lang strings, geometry, and textures.
+- `java-ropes/` — Fabric mod: Gradle-based Java project with the same game logic.
 
-The Bedrock Script API target is `@minecraft/server` 1.12.0 against `min_engine_version` 1.20.0. Scripts are ESM (`"type": "module"` at the repo root).
+The Bedrock Script API target is `@minecraft/server` 2.7.0 against `min_engine_version` 1.26.0. Scripts are ESM (`"type": "module"` at the repo root).
 
 ## Commands
 
 ```bash
 # Bedrock tests
 npm test                                                              # run all unit tests
-node --import ./tests/register-hooks.mjs --test tests/Example.test.mjs     # single file
+node --import ./tests/register-hooks.mjs --test tests/RopeChain.test.mjs     # single file
 node --import ./tests/register-hooks.mjs --test --test-name-pattern "pattern" tests/*.test.mjs  # filter by name
 
 # Java tests
-cd java-mymod && ./gradlew test                                       # run all Java tests
-cd java-mymod && ./gradlew build                                      # build mod JAR
-cd java-mymod && ./gradlew deployToMods                               # build and deploy to .minecraft/mods
+cd java-ropes && ./gradlew test                                       # run all Java tests
+cd java-ropes && ./gradlew build                                      # build mod JAR
+cd java-ropes && ./gradlew deployToMods                               # build and deploy to .minecraft/mods
 ```
 
 The `--import ./tests/register-hooks.mjs` flag is required for Bedrock tests: it installs a Node loader hook that redirects `@minecraft/server` to `tests/stubs/minecraft-server.mjs`. Without it, importing any production module fails because the Bedrock module doesn't exist in Node.
@@ -40,15 +40,15 @@ The codebase is split into three layers. Keep new code on the correct side of th
 
 **Block handler layer (`scripts/handler/`)** — thin glue between `world.afterEvents.playerPlaceBlock` / `playerBreakBlock` and the domain. Each handler matches by `typeId`, then delegates to the manager.
 
-The manager is the single source of truth. No subsystem keeps its own state — they all query through the manager. When you mutate state, call `manager.save()` so persistence stays in sync.
+The `RopeManager` is the single source of truth. No subsystem keeps its own state — they all query through the manager. When you mutate state, call `ropeManager.save()` so persistence stays in sync.
 
 ### Startup order (in `main.js`)
 
-The order in `main.js` is load-bearing: the manager exists before any subsystem so its reference can be shared, and persistence is hydrated both on `worldInitialize` and via a one-shot `system.run(...)` fallback because some Bedrock builds don't fire `worldInitialize` on script reload.
+The order in `main.js` is load-bearing: the manager exists before any subsystem so its reference can be shared, and persistence is hydrated both on `worldLoad` and via a one-shot `system.run(...)` fallback because some Bedrock builds don't fire `worldLoad` on script reload.
 
 ### Persistence
 
-State serializes to a single world dynamic property keyed by `PERSISTENCE_KEY` in `Constants.js`. The payload is the JSON form of all managed objects.
+State serializes to a single world dynamic property keyed by `ROPES_PERSISTENCE_KEY` in `util/RopeConstants.js`. The payload is the JSON form of all managed rope chains.
 
 ### Java parity
 
@@ -56,10 +56,10 @@ The Java edition follows the same architecture: domain classes have no Minecraft
 
 ## Conventions
 
-- **All magic numbers go in `scripts/util/Constants.js`.** Radii, intervals, scan thresholds, block IDs. Nothing hardcoded in handlers or domain classes.
-- **Block identifiers are namespaced with your mod ID** (e.g. `mymod:example_block`).
+- **All magic numbers go in `scripts/util/RopeConstants.js`.** Ranges, intervals, block IDs, climb speeds. Nothing hardcoded in handlers or domain classes.
+- **Block identifiers are namespaced with `ropes:`** (e.g. `ropes:rope`, `ropes:rope_ladder`).
 - **Domain code never imports `@minecraft/server`.** If you need the API in a domain class, that logic belongs in the subsystem or handler layer instead.
-- **Mutations to state must call `manager.save()`** so the world dynamic property stays current.
+- **Mutations to state must call `ropeManager.save()`** so the world dynamic property stays current.
 
 ## Tests
 
@@ -67,4 +67,4 @@ Tests live in `tests/*.test.mjs` and use `node:test` + `node:assert/strict`. The
 
 When adding a test for code that imports `@minecraft/server`, install fakes via `__setWorld` **before** importing the module under test, or rely on the default noop stub.
 
-Java tests live in `java-mymod/src/test/` and use JUnit 5. Domain tests need no Minecraft server — they test pure Java classes directly.
+Java tests live in `java-ropes/src/test/` and use JUnit 5. Domain tests need no Minecraft server — they test pure Java classes directly.

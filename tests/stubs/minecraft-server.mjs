@@ -32,10 +32,12 @@ function makeDefaultWorld() {
       playerPlaceBlock: makeNoopSubscribable(),
       playerBreakBlock: makeNoopSubscribable(),
       entitySpawn: makeNoopSubscribable(),
-      worldInitialize: makeNoopSubscribable()
+      worldInitialize: makeNoopSubscribable(),
+      itemUse: makeNoopSubscribable(),
     },
     beforeEvents: {
       entitySpawn: makeNoopSubscribable(),
+      playerBreakBlock: makeNoopSubscribable(),
     },
     getDynamicProperty(key) { return props.get(key); },
     setDynamicProperty(key, value) { props.set(key, value); },
@@ -48,20 +50,58 @@ function makeDefaultWorld() {
       };
     },
     getPlayers() { return []; },
+    getAllPlayers() { return []; },
   };
 }
 
 function makeDefaultSystem() {
-  return {
-    runInterval(_fn, _ticks) { return 0; },
-    runTimeout(_fn, _ticks) { return 0; },
-    run(_fn) { return 0; },
-    runJob(_gen) { return 0; },
-    clearRun(_id) {},
+  let nextHandle = 1;
+  const sys = {
+    currentTick: 0,
+    _scheduled: [],
+    _intervals: new Map(),
+    runInterval(fn, ticks) {
+      const id = nextHandle++;
+      sys._intervals.set(id, { fn, interval: ticks, nextFire: sys.currentTick + ticks });
+      return id;
+    },
+    runTimeout(fn, ticks) {
+      const id = nextHandle++;
+      sys._scheduled.push({ fn, fireAt: sys.currentTick + ticks, id });
+      return id;
+    },
+    run(fn) {
+      const id = nextHandle++;
+      sys._scheduled.push({ fn, fireAt: sys.currentTick, id });
+      return id;
+    },
+    runJob(_gen) { return nextHandle++; },
+    clearRun(id) {
+      sys._intervals.delete(id);
+      sys._scheduled = sys._scheduled.filter(s => s.id !== id);
+    },
+    advanceTicks(n) {
+      sys.currentTick += n;
+      const ready = sys._scheduled.filter(s => s.fireAt <= sys.currentTick);
+      sys._scheduled = sys._scheduled.filter(s => s.fireAt > sys.currentTick);
+      for (const s of ready) s.fn();
+
+      for (const [id, entry] of sys._intervals) {
+        while (entry.nextFire <= sys.currentTick) {
+          entry.fn();
+          if (!sys._intervals.has(id)) break;
+          entry.nextFire += entry.interval;
+        }
+      }
+    },
     afterEvents: {
       scriptEventReceive: makeNoopSubscribable(),
     },
+    beforeEvents: {
+      startup: makeNoopSubscribable(),
+    },
   };
+  return sys;
 }
 
 export let world = makeDefaultWorld();
@@ -79,6 +119,24 @@ export class ItemStack {
   }
 }
 
+export class BlockPermutation {
+  constructor(typeId, states = {}) {
+    this.type = { id: typeId };
+    this._states = { ...states };
+  }
+  getState(name) { return this._states[name]; }
+  getAllStates() { return { ...this._states }; }
+  static resolve(typeId, states = {}) {
+    return new BlockPermutation(typeId, states);
+  }
+}
+
+export const InputButton = {
+  Jump: "Jump",
+  Sneak: "Sneak",
+};
+
+
 export const EntityInitializationCause = {
   Born: "Born",
   Event: "Event",
@@ -86,6 +144,7 @@ export const EntityInitializationCause = {
   Spawned: "Spawned",
   Transformed: "Transformed"
 };
+
 
 /** Test-only: replace the exported `world` object. */
 export function __setWorld(w) { world = w; }

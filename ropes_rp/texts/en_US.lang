@@ -1,5 +1,5 @@
 tile.ropes:rope.name=Rope
 tile.ropes:rope_ladder.name=Rope Ladder
-item.ropes:rope.name=Rope
-item.ropes:rope_ladder.name=Rope Ladder
-item.ropes:whip.name=Whip
+item.ropes:rope=Rope
+item.ropes:rope_ladder=Rope Ladder
+item.ropes:whip=Whip

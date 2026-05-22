@@ -13,6 +13,8 @@ export const WHIP_DEPLOY_SEGMENTS = 4;
 export const WHIP_DAMAGE = 3;
 export const WHIP_HIT_PARTICLE = "minecraft:critical_hit_emitter";
 export const WHIP_HIT_PARTICLE_Y_OFFSET = 1;
+export const WHIP_KNOCKBACK_HORIZONTAL = 2.5;
+export const WHIP_KNOCKBACK_VERTICAL = 0.4;
 export const BREAK_BATCH_THRESHOLD = 16;
 
 export const DIR_OFFSETS = {

@@ -1,5 +1,11 @@
 import { world } from "@minecraft/server";
-import { WHIP_ITEM_ID, WHIP_HIT_PARTICLE, WHIP_HIT_PARTICLE_Y_OFFSET } from "../util/RopeConstants.js";
+import {
+  WHIP_ITEM_ID,
+  WHIP_HIT_PARTICLE,
+  WHIP_HIT_PARTICLE_Y_OFFSET,
+  WHIP_KNOCKBACK_HORIZONTAL,
+  WHIP_KNOCKBACK_VERTICAL,
+} from "../util/RopeConstants.js";
 
 export class WhipHitSubsystem {
   constructor(ropeManager) {
@@ -32,5 +38,30 @@ export class WhipHitSubsystem {
         z: loc.z,
       });
     } catch { /* particle spawn may fail in an unloaded chunk */ }
+
+    this._applyKnockback(attacker, hurtEntity, loc);
+  }
+
+  _applyKnockback(attacker, hurtEntity, loc) {
+    try {
+      const origin = attacker.location;
+      let dx = loc.x - origin.x;
+      let dz = loc.z - origin.z;
+      let len = Math.hypot(dx, dz);
+      if (len < 0.0001) {
+        const dir = attacker.getViewDirection?.() ?? { x: 0, z: 1 };
+        dx = dir.x;
+        dz = dir.z;
+        len = Math.hypot(dx, dz);
+      }
+      if (len < 0.0001) return;
+      dx /= len;
+      dz /= len;
+
+      hurtEntity.applyKnockback(
+        { x: dx * WHIP_KNOCKBACK_HORIZONTAL, z: dz * WHIP_KNOCKBACK_HORIZONTAL },
+        WHIP_KNOCKBACK_VERTICAL
+      );
+    } catch { /* knockback may fail on some entities */ }
   }
 }

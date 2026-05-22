@@ -1,0 +1,25 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "ropes:rope_ladder"
+    },
+    "tags": ["crafting_table"],
+    "pattern": [
+      "RSR",
+      "RSR",
+      "RSR"
+    ],
+    "key": {
+      "R": { "item": "ropes:rope" },
+      "S": { "item": "minecraft:stick" }
+    },
+    "unlock": {
+      "context": "AlwaysUnlocked"
+    },
+    "result": {
+      "item": "ropes:rope_ladder",
+      "count": 4
+    }
+  }
+}

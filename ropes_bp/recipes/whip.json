@@ -1,0 +1,25 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "ropes:whip"
+    },
+    "tags": ["crafting_table"],
+    "pattern": [
+      "RR",
+      "RR",
+      "SR"
+    ],
+    "key": {
+      "R": { "item": "ropes:rope" },
+      "S": { "item": "minecraft:stick" }
+    },
+    "unlock": {
+      "context": "AlwaysUnlocked"
+    },
+    "result": {
+      "item": "ropes:whip",
+      "count": 1
+    }
+  }
+}

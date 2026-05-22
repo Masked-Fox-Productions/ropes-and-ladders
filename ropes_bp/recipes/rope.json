@@ -1,0 +1,25 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "ropes:rope"
+    },
+    "tags": ["crafting_table"],
+    "pattern": [
+      "WS",
+      "SW",
+      "WS"
+    ],
+    "key": {
+      "W": { "item": "minecraft:wheat" },
+      "S": { "item": "minecraft:string" }
+    },
+    "unlock": {
+      "context": "AlwaysUnlocked"
+    },
+    "result": {
+      "item": "ropes:rope",
+      "count": 4
+    }
+  }
+}

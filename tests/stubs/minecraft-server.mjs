@@ -34,6 +34,7 @@ function makeDefaultWorld() {
       entitySpawn: makeNoopSubscribable(),
       worldInitialize: makeNoopSubscribable(),
       itemUse: makeNoopSubscribable(),
+      entityHurt: makeNoopSubscribable(),
     },
     beforeEvents: {
       entitySpawn: makeNoopSubscribable(),

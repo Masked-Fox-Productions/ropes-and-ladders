@@ -17,6 +17,10 @@
       "minecraft:hand_equipped": true,
       "minecraft:damage": {
         "value": 3
+      },
+      "minecraft:piercing_weapon": {
+        "reach": { "min": 0.0, "max": 6.0 },
+        "creative_reach": { "min": 0.0, "max": 6.0 }
       }
     }
   }

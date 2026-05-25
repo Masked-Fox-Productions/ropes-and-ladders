@@ -2,6 +2,7 @@ import { RopePlacementHandler } from "./handler/RopePlacementHandler.js";
 import { RopeInteractionHandler } from "./handler/RopeInteractionHandler.js";
 import { RopeBreakHandler } from "./handler/RopeBreakHandler.js";
 import { WhipSubsystem } from "./subsystem/WhipSubsystem.js";
+import { WhipHitSubsystem } from "./subsystem/WhipHitSubsystem.js";
 import { ClimbableSubsystem } from "./subsystem/ClimbableSubsystem.js";
 
 export function initRopes(ropeManager) {
@@ -15,6 +16,9 @@ export function initRopes(ropeManager) {
 
   const whip = new WhipSubsystem(ropeManager);
   whip.register();
+
+  const whipHit = new WhipHitSubsystem(ropeManager);
+  whipHit.register();
 
   const climbable = new ClimbableSubsystem(ropeManager);
   climbable.register();

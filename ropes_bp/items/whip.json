@@ -4,8 +4,7 @@
     "description": {
       "identifier": "ropes:whip",
       "menu_category": {
-        "category": "equipment",
-        "group": "minecraft:itemGroup.name.sword"
+        "category": "equipment"
       }
     },
     "components": {
@@ -18,6 +17,10 @@
       "minecraft:hand_equipped": true,
       "minecraft:damage": {
         "value": 3
+      },
+      "minecraft:piercing_weapon": {
+        "reach": { "min": 0.0, "max": 6.0 },
+        "creative_reach": { "min": 0.0, "max": 6.0 }
       }
     }
   }
